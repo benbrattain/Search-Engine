@@ -1,25 +1,10 @@
-# I built this assignment based off of the framework of hw4. Instead of scanning the inverted index,
-# I instead took parts of index.py and retrieve.py in order to build a new program that could scrape the pages by itself.
-# My methodology was pretty simple, I scanned the index.dat file and created a new Document object for each page.
-# I also kept track of each new document while doing this.
-# With the document object, I went ahead and filtered out and stemmed all the words just like in assignment 4.
-# After that, I computed the TF score on the spot and then put the document into a large document array.
-# After all of the documents were processed, I went ahead and calculated the idf_score tf_idf_score at the same time for each document.
-# Finally, I sorted all of the documents by the tf_idf_scores and printed the highest 25, completing the assignment.
-
-# If I was dealing with a much larger document base, I could have come up with some sort of method to prune out lower tf_idf_scores as they came along.
-# That way I would use a smaller array and have a shorter sorting time. However, given the fact that it was only a few hundered documents, this wasn't necessary.
-
-
-
 import sys, re, collections, math
 from nltk.corpus import stopwords
 from nltk.stem import *
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 
-
-hit_list = []
+words = []
 
 #stems words
 
@@ -33,11 +18,46 @@ def stem_words(words):
         
 	return output
 
+#makes sure every document in words is shared across all words
+def make_hit_list() :
+	#if only one query do nothing
+	if len(words) <= 1 :
+		return
+	#remove documents not in first word from other documents
+	for word in words[1:] :
+		for doc, freq in word.documents.iteritems() :
+			if doc not in words[0].documents.iterkeys() :
+				word.documents.pop(doc, None)
+
+	#remove documents not in cleaned other words from word 1
+	for doc, freq in words[0].documents.iteritems() :
+		if doc not in words[1].documents.iterkeys() :
+			words[0].documents.pop(doc, None)
+
+class Word() :
+	def __init__(self,array) :
+		self.word = array[0]
+		self.document_string = array[1]
+		self.documents = self.extract_documents()
+
+
+	def extract_documents(self):
+		documents = {}
+		doc = re.findall('\w*\.html', self.document_string)
+		freq = re.findall('\s\d{1}\s',self.document_string)
+		for i in range(len(doc)) :
+			documents[doc[i]] = freq[i]
+
+		return documents
+
+
+
 
 if __name__ == '__main__':
     try:
         del sys.argv[0] # Delete the file name from the args
-        word_list = stem_words(sys.argv)
+        # word_list = stem_words(sys.argv)
+        word_list = stem_words(["not", "feedback"])
     except IndexError:
         raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
 
@@ -47,7 +67,11 @@ if __name__ == '__main__':
         total_documents = 0
         with open(file) as doc:
             for line in doc:
-                print line         
+                temp = line.split(" documents: ")
+                if temp[0] in word_list:
+                	word = Word(temp)
+                	words.append(word)
+        make_hit_list()
 
     except IOError as e:
         raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")
