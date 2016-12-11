@@ -50,6 +50,7 @@ class Document(object):
         self.title
         self.links = collections.Counter(self.parse_links())
         self.num_links = sum(self.links.values())
+        self.pagerank = 1 #default score to start. will use this in pagerank.py later
         self.compute_words()
         self.write_doc()
         documents.append(self)
@@ -140,16 +141,16 @@ class Document(object):
             doc.write(string)
 
 if __name__ == '__main__':
-    try:
-        del sys.argv[0] # Delete the file name from the args
-        location = sys.argv[0] # Get the first real arg, the name of the file to analyze
-        index = sys.argv[1] #name of files
-    except IndexError:
-        raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
+    # try:
+    #     del sys.argv[0] # Delete the file name from the args
+    #     location = sys.argv[0] # Get the first real arg, the name of the file to analyze
+    #     index = sys.argv[1] #name of files
+    # except IndexError:
+    #     raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
 
     try:
         
-        file = location + index
+        file = 'pages/index.dat'
         with open(file) as doc:
             for line in doc:
                 info = line.split()

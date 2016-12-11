@@ -7,16 +7,16 @@ import subprocess
 def main():
     ''' Take first 5 arguments and execute scrapy spider '''
     # obtain current working directory from the path of this script
-    cwd = os.path.dirname(os.path.realpath(__file__))
+    # cwd = os.path.dirname(os.path.realpath(__file__))
 
-    # get commmand line arguments
-    if len(sys.argv) < 5:
-        print 'not enough argument'
-        return
-    start_urls = sys.argv[1]
-    num_page = sys.argv[2]
-    dest_dir = sys.argv[3]
-    algo = sys.argv[4]
+    # # get commmand line arguments
+    # if len(sys.argv) < 5:
+    #     print 'not enough argument'
+    #     return
+    start_urls = 'wikipedia.com/wiki/dogs'
+    num_page = '1000'
+    dest_dir = 'pages/'
+    algo = 'bfs'
 
     # call scrapy in cwd with specific arguments
     args = ' '.join(['scrapy', 'crawl', 'example',

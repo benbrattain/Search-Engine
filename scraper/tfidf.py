@@ -111,7 +111,7 @@ if __name__ == '__main__':
     try:
         del sys.argv[0] # Delete the file name from the args
         # word_list = stem_words(sys.argv)
-        word_list = stem_words(["not", "feedback"])
+        word_list = stem_words(["not", "feedback"]) #be sure to start later
     except IndexError:
         raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
 
@@ -138,9 +138,9 @@ if __name__ == '__main__':
         	Document(doc)
 
 
-        documents.sort(key=lambda x: x.tf_idf, reverse=True)
-        for doc in documents:
-        	print doc.name
+        name = 'tfidf.p'
+        f = open(name, 'w')
+        pickle.dump(name, documents)
 
     except IOError as e:
         raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")
