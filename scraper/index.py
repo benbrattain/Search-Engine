@@ -1,4 +1,4 @@
-import sys, re, collections
+import sys, re, collections, pickle
 from nltk.corpus import stopwords
 from nltk.stem import *
 from bs4 import BeautifulSoup
@@ -8,6 +8,15 @@ sys.setdefaultencoding('utf-8')
 
 #enables me to process all the words for the invindex
 words = []
+#for pagerank
+documents = set()
+
+#pickles documents for pagerank so I don't have to parse pages twice.
+def create_pickles(documents) :
+    f = open('documents.p', 'w')
+    pickle.dump(documents, f)
+    f.close()
+
 
 def write_invindex(words):
     string = ""
@@ -39,8 +48,26 @@ class Document(object):
         self.url = url
         self.name = name
         self.title
+        self.links = collections.Counter(self.parse_links())
+        self.num_links = sum(self.links.values())
         self.compute_words()
         self.write_doc()
+        documents.append(self)
+
+    #for pagerank later
+    def parse_links(self) :
+        links = None
+        with open(self.document) as doc:
+            html = doc.read()
+            soup = BeautifulSoup(html)
+            links = soup.findAll(href = True)
+            return links
+
+    #removes links that won't be in my index so I don't have to deal with them for Pagerank. Already computed num of links on the page.
+    def clean_links(self) :
+        for doc in documents:
+            if doc.url not in self.links :
+                del self.links[doc.url]
 
       
     def parse_words(self):
@@ -128,7 +155,12 @@ if __name__ == '__main__':
                 info = line.split()
                 currentFile = location + info[0]
                 document = Document(currentFile, info[1],info[0])
-        write_invindex(words)            
+        write_invindex(words)
+
+        #for pagerank later.
+        for doc in documents :
+            doc.clean_links()
+        create_pickles()            
 
     except IOError as e:
         raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")

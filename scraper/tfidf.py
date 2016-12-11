@@ -87,12 +87,15 @@ class Document() :
 		self.title = document[1]
 		self.url = document[2]
 
+	# occurances of words in doc / length of doc
 	def compute_tf(self):
 		tf = 0.0
 		for word in words :
 			tf += word.documents[self.name]
 		return tf / self.size
 
+	# total documents / number of documents terms appear in. Purposefully include docs outside of hitlist to get more variance for common words.
+	# enables rare words to hold more weight in this computation.
 	def compute_idf(self) :
 		n = len(words)
 		num_of_docs = 0
