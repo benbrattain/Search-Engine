@@ -158,8 +158,8 @@ def main() :
     return doc_hash        
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
     # try:
     #     del sys.argv[0] # Delete the file name from the args
     #     location = sys.argv[0] # Get the first real arg, the name of the file to analyze

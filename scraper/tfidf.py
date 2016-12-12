@@ -6,7 +6,7 @@ from unidecode import unidecode
 
 words = []
 documents = []
-# document_details = {}
+document_details = {}
 
 #stems words
 
@@ -36,20 +36,24 @@ def make_hit_list() :
 
 	#remove documents not in cleaned other words from word 1
 	for doc, freq in words[0].documents.iteritems() :
+		temp_docs = []
 		if doc not in words[1].documents.iterkeys() :
-			words[0].documents.pop(doc, None)
+			temp_docs.append(doc)
 
-# def get_docs_details(doc) :
-# 	for line in doc :
-# 		temp = line.split(" url: ")
-# 		url = temp[1]
-# 		temp = temp[0].split(" title: ")
-# 		title = temp[1]
-# 		temp = temp[0].split(" length: ")
-# 		name = temp[0]
-# 		size = int(temp[1])
-# 		document = [size, title, url]
-# 		document_details[name] = document
+	for doc in temp_docs :
+		words[0].documents.pop(doc, None)
+
+def get_docs_details(doc) :
+	for line in doc :
+		temp = line.split(" url: ")
+		url = temp[1]
+		temp = temp[0].split(" title: ")
+		title = temp[1]
+		temp = temp[0].split(" length: ")
+		name = temp[0]
+		size = int(temp[1])
+		document = [size, title, url]
+		document_details[name] = document
 
 class Word() :
 	def __init__(self,array) :
@@ -64,7 +68,8 @@ class Word() :
 		doc = re.findall('\w*\.html', self.document_string)
 		freq = re.findall('\s\d\s',self.document_string)
 		frequency = map(int, freq)
-		for i in range(len(doc)) :
+		#in case there is a discrepancy for some reason, don't go out of index range.
+		for i in range(min(len(doc), len(frequency))) :
 			documents[doc[i]] = frequency[i]
 
 		return documents
@@ -91,7 +96,8 @@ class Document() :
 	def compute_tf(self):
 		tf = 0.0
 		for word in words :
-			tf += word.documents[self.name]
+			if self.name in word.documents.keys() :
+				tf += word.documents[self.name]
 		return tf / self.size
 
 	# total documents / number of documents terms appear in. Purposefully include docs outside of hitlist to get more variance for common words.
@@ -113,41 +119,45 @@ class Doc():
 		self.url = doc.url
 		self.tf_idf = doc.tf_idf
 
-if __name__ == '__main__':
- 
-    word_list = stem_words(["not", "feedback"]) #be sure to start later
+def main():
+	word_list = stem_words(["news", "Syra", "Trump", "President", "Sports"]) #be sure to start later
+	global total_documents
 
-    try:
         
-        file = 'invindex.dat'
-        total_documents = 0
-        with open(file) as doc:
-            for line in doc:
-            	total_documents += 1
-                temp = line.split(" documents: ")
-                if temp[0] in word_list:
-                	word = Word(temp)
-                	words.append(word)
-        make_hit_list()
+	file = 'invindex.dat'
+	total_documents = 0
+	with open(file) as doc:
+	    for line in doc:
+	    	total_documents += 1
+	        temp = line.split(" documents: ")
+	        if temp[0] in word_list:
+	        	word = Word(temp)
+	        	words.append(word)
+	make_hit_list()
 
-        # #get doc details from docs.dat for later use.
-        # file = 'docs.dat'
-        # with open(file) as doc :
-        # 	get_docs_details(doc)
-        
-        #make all of the documents
-        for doc in words[0].documents.iterkeys() :
-        	Document(doc)
-        documents.sort(key=lambda:x x.tf_idf, reverse=True)
-        
-        tf_idf_list = []
-        names = []
-        for doc in documents:
-        	if doc.name not in names :
-        		names.append(doc.name)
-        		temp = Doc(doc)
-        		tf_idf_list.append(temp)
+	# #get doc details from docs.dat for later use.
+	file = 'docs.dat'
+	with open(file) as doc :
+		get_docs_details(doc)
 
-        name = 'tfidf.p'
-        with open(name, 'w') as file: 
-        	pickle.dump(documents,file)
+	#make all of the documents
+	for doc in words[0].documents.iterkeys() :
+		Document(doc)
+	documents.sort(key=lambda x: x.name)
+
+	tf_idf_list = []
+	names = []
+	for doc in documents:
+		if doc.name not in names :
+			names.append(doc.name)
+			temp = Doc(doc)
+			tf_idf_list.append(temp)
+
+	name = 'tfidf.p'
+	with open(name, 'w') as file: 
+		pickle.dump(documents,file)
+
+	return documents
+
+# if __name__ == '__main__':	
+# 	main()

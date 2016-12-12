@@ -27,5 +27,5 @@ def main():
     subprocess.call(args, cwd=cwd, shell=True)
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
