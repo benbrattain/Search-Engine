@@ -9,8 +9,9 @@ sys.setdefaultencoding('utf-8')
 #enables me to process all the words for the invindex
 words = []
 #for pagerank
-global documents
 documents = list()
+global doc_hash
+doc_hash = {}
 
 
 def write_invindex(words):
@@ -52,12 +53,15 @@ class Document(object):
 
     #for pagerank later
     def parse_links(self) :
-        links = None
+        links = []
         with open(self.document) as doc:
             html = doc.read()
-            soup = BeautifulSoup(html)
-            links = soup.findAll(href = True)
-            return links
+            soup = BeautifulSoup(html, 'html.parser')
+            for link in soup.findAll(href = True):
+                links.append(link.get('href'))
+        return links
+
+            
 
     #removes links that won't be in my index so I don't have to deal with them for Pagerank. Already computed num of links on the page.
     def clean_links(self) :
@@ -148,7 +152,10 @@ def main() :
     #for pagerank later.
     for doc in documents :
         doc.clean_links()
-    return documents         
+    for doc in documents :
+        doc_hash[doc.url] = doc
+
+    return doc_hash        
 
 
 if __name__ == '__main__':

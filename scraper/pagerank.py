@@ -6,6 +6,7 @@
 from index import *
 import index
 import pickle
+sys.setrecursionlimit(10000)
 
 # class Document(object):
 #     def __init__(self, document, url, name):
@@ -27,35 +28,57 @@ import pickle
 
 
 doc_names = {}
+documents = index.main()
 
 
 def pagerank(graph) :
 	rank = 0
 	for doc in graph.links.keys() :
 		#number of times link is in page
-		freq = graph[doc]
-		name = doc_names[doc]
-		page = documents
-		rank += freq * (page.pagerank / page.num_links)
+		freq = graph.links[doc]
+		#some links that aren't cleaned perfectly sometimes get through and are in the list unfortunately. they don't have a doc and as such are skipped.
+		if doc in documents.keys() :
+			page = documents[doc]
+		else :
+			continue
+		rank += freq * (float(page.pagerank) / float(page.num_links))
 	rank = .15 + (.85 * rank)
 	graph.pagerank = rank
 	return rank
 
+#Smaller object with less data stored as I'll no longer need long lists for each doc after Pagerank is computed. Had issues with recursion depth
+class Doc():
+	def __init__ (self, doc):
+		self.name = doc.name
+		self.title = doc.title
+		self.url = doc.url
+		self.pagerank = doc.pagerank
+
+def main() :
+	documents_array = []
+	#for sorting at the end.
+	for url, doc in documents.iteritems():
+		documents_array.append(doc)
+	for i in range(50):
+		for url, doc in documents.iteritems() :
+			pagerank(doc)
+
+	documents_array.sort(key=lambda x: x.pagerank, reverse = True)
+	#remove any possible duplicates
+	pageranks = list()
+	names = list()
+	for doc in documents_array :
+		if doc.name not in names :
+			temp = Doc(doc)
+			pageranks.append(temp)
+			names.append(doc.name)
+	
+	file = 'pagerank.p'
+	with open(file, 'w') as f:
+		pickle.dump(pageranks,f)
 
 if __name__ == '__main__':
-
-	
-	documents = index.main()
-	print documents
-	docs = []
-
-	ranked_documents = []
-	for doc in documents :
-		name = doc.name + '.p'
-		f = open(name, 'r')
-		page = pickle.load(f)
-		f.close()
-		ranked_documents.append(page)
+	main()
 
 
 

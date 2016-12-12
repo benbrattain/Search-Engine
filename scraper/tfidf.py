@@ -6,7 +6,7 @@ from unidecode import unidecode
 
 words = []
 documents = []
-document_details = {}
+# document_details = {}
 
 #stems words
 
@@ -39,17 +39,17 @@ def make_hit_list() :
 		if doc not in words[1].documents.iterkeys() :
 			words[0].documents.pop(doc, None)
 
-def get_docs_details(doc) :
-	for line in doc :
-		temp = line.split(" url: ")
-		url = temp[1]
-		temp = temp[0].split(" title: ")
-		title = temp[1]
-		temp = temp[0].split(" length: ")
-		name = temp[0]
-		size = int(temp[1])
-		document = [size, title, url]
-		document_details[name] = document
+# def get_docs_details(doc) :
+# 	for line in doc :
+# 		temp = line.split(" url: ")
+# 		url = temp[1]
+# 		temp = temp[0].split(" title: ")
+# 		title = temp[1]
+# 		temp = temp[0].split(" length: ")
+# 		name = temp[0]
+# 		size = int(temp[1])
+# 		document = [size, title, url]
+# 		document_details[name] = document
 
 class Word() :
 	def __init__(self,array) :
@@ -105,15 +105,17 @@ class Document() :
 			num_of_docs += 1
 		return math.log(float(total_documents)/float(num_of_docs))
 
-
+#Smaller object with less data stored as I'll no longer need long lists for each doc after InvIndex is computed. Had issues with recursion depth
+class Doc():
+	def __init__ (self, doc):
+		self.name = doc.name
+		self.title = doc.title
+		self.url = doc.url
+		self.tf_idf = doc.tf_idf
 
 if __name__ == '__main__':
-    try:
-        del sys.argv[0] # Delete the file name from the args
-        # word_list = stem_words(sys.argv)
-        word_list = stem_words(["not", "feedback"]) #be sure to start later
-    except IndexError:
-        raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
+ 
+    word_list = stem_words(["not", "feedback"]) #be sure to start later
 
     try:
         
@@ -128,19 +130,24 @@ if __name__ == '__main__':
                 	words.append(word)
         make_hit_list()
 
-        #get doc details from docs.dat for later use.
-        file = 'docs.dat'
-        with open(file) as doc :
-        	get_docs_details(doc)
+        # #get doc details from docs.dat for later use.
+        # file = 'docs.dat'
+        # with open(file) as doc :
+        # 	get_docs_details(doc)
         
         #make all of the documents
         for doc in words[0].documents.iterkeys() :
         	Document(doc)
-
+        documents.sort(key=lambda:x x.tf_idf, reverse=True)
+        
+        tf_idf_list = []
+        names = []
+        for doc in documents:
+        	if doc.name not in names :
+        		names.append(doc.name)
+        		temp = Doc(doc)
+        		tf_idf_list.append(temp)
 
         name = 'tfidf.p'
         with open(name, 'w') as file: 
-        	pickle.dump(file, documents)
-
-    except IOError as e:
-        raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")
+        	pickle.dump(documents,file)
