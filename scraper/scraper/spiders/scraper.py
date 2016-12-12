@@ -50,6 +50,7 @@ class Stack(Container):
 class ExampleSpider(scrapy.Spider):
     name = "example"
     start_urls = []
+    allowed_domains = []
     next_page = None
     flag = False
     num_pages_visited = 0
@@ -144,6 +145,6 @@ class ExampleSpider(scrapy.Spider):
             if next_page and (next_page not in self.visited):
                 self.visited.append(next_page)
                 self.num_pages_visited += 1
-                request = scrapy.Request(next_page, callback = self.parse)
+                request = scrapy.Request(next_page, callback = self.parse, dont_filter = True)
                 yield request
         

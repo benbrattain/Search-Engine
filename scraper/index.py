@@ -9,13 +9,8 @@ sys.setdefaultencoding('utf-8')
 #enables me to process all the words for the invindex
 words = []
 #for pagerank
-documents = set()
-
-#pickles documents for pagerank so I don't have to parse pages twice.
-def create_pickles(documents) :
-    f = open('documents.p', 'w')
-    pickle.dump(documents, f)
-    f.close()
+global documents
+documents = list()
 
 
 def write_invindex(words):
@@ -140,28 +135,27 @@ class Document(object):
             string = self.name + " length: " + str(self.length) + " title: " + self.title + " url: " + self.url + "\n"
             doc.write(string)
 
+def main() :
+        
+    file = 'pages/index.dat'
+    with open(file) as doc:
+        for line in doc:
+            info = line.split()
+            currentFile = 'pages/' + info[0]
+            document = Document(currentFile, info[1],info[0])
+    write_invindex(words)
+
+    #for pagerank later.
+    for doc in documents :
+        doc.clean_links()
+    return documents         
+
+
 if __name__ == '__main__':
+    main()
     # try:
     #     del sys.argv[0] # Delete the file name from the args
     #     location = sys.argv[0] # Get the first real arg, the name of the file to analyze
     #     index = sys.argv[1] #name of files
     # except IndexError:
     #     raise ValueError ("Please specify a file in the command arg, like: 'python index.py directory/ index.dat'")
-
-    try:
-        
-        file = 'pages/index.dat'
-        with open(file) as doc:
-            for line in doc:
-                info = line.split()
-                currentFile = location + info[0]
-                document = Document(currentFile, info[1],info[0])
-        write_invindex(words)
-
-        #for pagerank later.
-        for doc in documents :
-            doc.clean_links()
-        create_pickles()            
-
-    except IOError as e:
-        raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")

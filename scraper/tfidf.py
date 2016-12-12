@@ -1,4 +1,4 @@
-import sys, re, collections, math
+import sys, re, collections, math, pickle
 from nltk.corpus import stopwords
 from nltk.stem import *
 from bs4 import BeautifulSoup
@@ -139,8 +139,8 @@ if __name__ == '__main__':
 
 
         name = 'tfidf.p'
-        f = open(name, 'w')
-        pickle.dump(name, documents)
+        with open(name, 'w') as file: 
+        	pickle.dump(file, documents)
 
     except IOError as e:
         raise IOError("Please enter a correct file. Python says: '" + str(e)+"'")
