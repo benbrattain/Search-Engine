@@ -21,14 +21,21 @@ def merge_scores(tfidfs, pageranks) :
 				MergedRank(doc, page)
 				break
 
-if __name__ == '__main__':
-	
-	crawl.main()
+def main(word_list) :
+	crawl.main(word_list)
 	#pagerank starts index.py first.
 	pagerank = pagerank.main()
 	tfidf = tfidf.main()
 	merge_scores(tfidf, pagerank)
 	merged_docs.sort(key= lambda x : x.rank, reverse = True)
 
+	#to output to cgi
+	results = []
 	for doc in merged_docs :
-		print "Name : " + doc.name + " Title: " + doc.title + " Url: " + doc.url + " Score: " + str(doc.rank)
+		results.append(doc.url)
+
+	# for doc in merged_docs :
+	# 	print "Name : " + doc.name + " Title: " + doc.title + " Url: " + doc.url + " Score: " + str(doc.rank) 
+if __name__ == '__main__':
+	word_list = ["sports"]
+	main(word_list)
