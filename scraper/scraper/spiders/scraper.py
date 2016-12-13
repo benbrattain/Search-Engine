@@ -100,8 +100,6 @@ class ExampleSpider(scrapy.Spider):
         # - self.dest_folder = path to folder where files should be stored
         # - self.container = Container object where urls are stored and extracted
         
-        max_pages = self.num_page_to_fetch
-        dest_folder = self.dest_folder
         self.visited.append(response.url)
 
         if response.url[len(response.url) - 1] == '/':
@@ -109,10 +107,8 @@ class ExampleSpider(scrapy.Spider):
         else:
             self.visited.append(response.url + '/')
             
-        #self.num_pages_visited += 1
 
         # extract links from page
-        #links = response.xpath('@href').extract()
         links = response.css('a::attr(href)').extract()
 
         if isinstance(self.container, Stack):
@@ -121,21 +117,24 @@ class ExampleSpider(scrapy.Spider):
         for link in links:
             if response.urljoin(link) not in self.visited:
                 self.container.add_element(response.urljoin(link))
+        dest_folder = self.dest_folder
+
+        file = dest_folder + str(self.num_pages_visited) + '.html'
+
+        with open(file, 'w') as f:
+            f.write(response.body)
 
 
-        file_name = dest_folder + str(self.num_pages_visited) + '.html'
-        html_writer = open(file_name, 'w')
-        html_writer.write(response.body)
-        html_writer.close()
 
-        index_file = dest_folder + 'index.dat'
-        writer = open(index_file, 'a+')
-        writer.write(str(self.num_pages_visited) + '.html ' + response.url + '\n')
-        writer.close()
-        self.log('Saved file: ' + file_name)
+        file = dest_folder + 'index.dat'
+        string = str(self.num_pages_visited) + '.html ' + response.url + '\n'
+        with open(file,'a+') as f:
+            f.write(string)
+        self.log("Saved: " + file)
+        
+        max_pages = self.num_page_to_fetch
 
-
-        if (self.num_pages_visited < max_pages) and self.container:
+        if self.container and (self.num_pages_visited < max_pages):
             next_page = self.container.get_element()
                 
             while self.container and next_page in self.visited:
@@ -143,8 +142,8 @@ class ExampleSpider(scrapy.Spider):
 
 
             if next_page and (next_page not in self.visited):
-                self.visited.append(next_page)
                 self.num_pages_visited += 1
+                self.visited.append(next_page)
                 request = scrapy.Request(next_page, callback = self.parse, dont_filter = True)
                 yield request
         
