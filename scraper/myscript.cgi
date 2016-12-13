@@ -1,6 +1,23 @@
 #!/user/bin/python
-import cgi, start
+import cgi
 from start import *
+
+# Base of the html content
+CONTENT = """
+<html>
+<title>Search Engine</title>
+<body>
+    <h1>News Search Engine</h1>
+    <form method=POST action="myscript.cgi">
+        <P><B>Your last query is "%s"; enter your new query</B>
+        <P><input type=text name=query>
+        <P><input type=submit>
+    </form>
+    <h2>Results</h2>
+    %s
+</body></html>
+"""
+
 def format_results(results):
   # join hyperlink tags with newlines
   return '\n'.join(

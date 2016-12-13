@@ -119,8 +119,8 @@ class Doc():
 		self.url = doc.url
 		self.tf_idf = doc.tf_idf
 
-def main():
-	word_list = stem_words(["news", "Syra", "Trump", "President", "Sports"]) #be sure to start later
+def main(word_input):
+	word_list = stem_words(word_input) #be sure to start later
 	global total_documents
 
         

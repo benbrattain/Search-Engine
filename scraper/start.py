@@ -22,11 +22,20 @@ def merge_scores(tfidfs, pageranks) :
 				break
 
 def main(word_list) :
-	crawl.main(word_list)
+	#crawl.main()
 	#pagerank starts index.py first.
-	pagerank = pagerank.main()
-	tfidf = tfidf.main()
-	merge_scores(tfidf, pagerank)
+	
+	#This segment will be uncommented when running on burrow.
+	#file = 'pageranks.p'
+	#with open(file) as f:
+	#	pageranks = pickle.load(f)
+
+	#This segment will be uncommented when running locally
+	pageranks = pagerank.main()
+
+
+	tfidfs = tfidf.main(word_list)
+	merge_scores(tfidfs, pageranks)
 	merged_docs.sort(key= lambda x : x.rank, reverse = True)
 
 	#to output to cgi
@@ -34,8 +43,10 @@ def main(word_list) :
 	for doc in merged_docs :
 		results.append(doc.url)
 
+	return results
+
 	# for doc in merged_docs :
 	# 	print "Name : " + doc.name + " Title: " + doc.title + " Url: " + doc.url + " Score: " + str(doc.rank) 
 if __name__ == '__main__':
-	word_list = ["sports"]
-	main(word_list)
+	wordlist = ["news", "politics", "appointment"]
+	main(wordlist)
