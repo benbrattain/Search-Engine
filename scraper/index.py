@@ -13,7 +13,6 @@ documents = list()
 global doc_hash
 doc_hash = {}
 
-
 def write_invindex(words):
     string = ""
     with open('invindex.dat','a') as doc:
@@ -44,14 +43,15 @@ class Document(object):
         self.url = url
         self.name = name
         self.title
-        self.links = collections.Counter(self.parse_links())
-        self.num_links = sum(self.links.values())
+        self.links = {}
+        self.outboundlinks = collections.Counter(self.parse_links())
+        self.num_links = sum(self.outboundlinks.values())
         self.pagerank = 1 #default score to start. will use this in pagerank.py later
         self.compute_words()
         self.write_doc()
         documents.append(self)
 
-    #for pagerank later
+    #for pagerank later get all outbound links
     def parse_links(self) :
         links = []
         with open(self.document) as doc:
@@ -61,13 +61,19 @@ class Document(object):
                 links.append(link.get('href'))
         return links
 
-            
+    #sets all of the links
+    def set_inbound_links_other_docs(self):
+        for link, freq in self.outboundlinks.iteritems():
+            if link in doc_hash.keys():
+                doc = doc_hash[link]
+                doc.links[doc] = freq
 
-    #removes links that won't be in my index so I don't have to deal with them for Pagerank. Already computed num of links on the page.
-    def clean_links(self) :
-        for doc in documents:
-            if doc.url not in self.links :
-                del self.links[doc.url]
+
+    # #removes links that won't be in my index so I don't have to deal with them for Pagerank. Already computed num of links on the page.
+    # def clean_links(self) :
+    #     for doc in documents:
+    #         if doc.url not in self.links :
+    #             del self.links[doc.url]
 
       
     def parse_words(self):
@@ -150,10 +156,13 @@ def main() :
     write_invindex(words)
 
     #for pagerank later.
-    for doc in documents :
-        doc.clean_links()
+    # for doc in documents :
+    #     doc.clean_links()
     for doc in documents :
         doc_hash[doc.url] = doc
+    for doc in documents:
+        doc.set_inbound_links_other_docs()
+
 
     return doc_hash        
 

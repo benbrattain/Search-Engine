@@ -8,24 +8,6 @@ import index
 import pickle
 sys.setrecursionlimit(10000)
 
-# class Document(object):
-#     def __init__(self, document, url, name):
-#         self.document = document
-#         self.words = self.parse_words()
-#         self.filtered_words = self.filter_words(self.words)
-#         self.stemmed_words = self.stem_words(self.filtered_words)
-#         self.length = len(self.stemmed_words)
-#         self.counted_words = collections.Counter(self.stemmed_words)
-#         self.url = url
-#         self.name = name
-#         self.title
-#         self.links = collections.Counter(self.parse_links())
-#         self.num_links = sum(self.links.values())
-#         self.pagerank = 1 #default score to start. will use this in pagerank.py later
-#         self.compute_words()
-#         self.write_doc()
-#         documents.append(self)
-
 
 doc_names = {}
 global documents

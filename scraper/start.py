@@ -22,7 +22,7 @@ def merge_scores(tfidfs, pageranks) :
 				break
 
 def main(word_list) :
-	#crawl.main()
+	# crawl.main()
 	#pagerank starts index.py first.
 	
 	#This segment will be uncommented when running on burrow.
@@ -42,7 +42,7 @@ def main(word_list) :
 	results = []
 	for doc in merged_docs :
 		results.append(doc.url)
-
+	print results
 	return results
 
 	# for doc in merged_docs :
